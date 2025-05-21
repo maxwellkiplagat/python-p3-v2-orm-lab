@@ -20,6 +20,16 @@ class Employee:
         )
 
     @property
+    def summary(self):
+        return self._summary
+
+    @summary.setter
+    def summary(self, value):
+        if not isinstance(value, str) or len(value.strip()) == 0:
+            raise ValueError("Summary must be a non-empty string")
+        self._summary = value
+
+    @property
     def name(self):
         return self._name
 
@@ -31,7 +41,17 @@ class Employee:
             raise ValueError(
                 "Name must be a non-empty string"
             )
+    @property
+    def employee_id(self):
+        return self._employee_id
 
+    @employee_id.setter
+    def employee_id(self, value):
+        if not isinstance(value, int):
+            raise ValueError("employee_id must be an integer")
+        self._employee_id = value
+
+        
     @property
     def job_title(self):
         return self._job_title
@@ -186,5 +206,7 @@ class Employee:
         return cls.instance_from_db(row) if row else None
 
     def reviews(self):
-        """Return list of reviews associated with current employee"""
-        pass
+        from lib.review import Review
+        CURSOR.execute("SELECT * FROM reviews WHERE employee_id = ?", (self.id,))
+        rows = CURSOR.fetchall()
+        return [Review.instance_from_db(row) for row in rows]
